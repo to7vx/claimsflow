@@ -54,6 +54,9 @@ logs/
 *.log
 .cache/
 
+# --- Tooling-specific (local agent config) ----------------------------------
+.claude/
+
 # --- Project-specific (interview prep — do NOT commit) ----------------------
 docs/INTERVIEW_TALKING_POINTS.md
 

@@ -15,9 +15,19 @@ from __future__ import annotations
 
 import asyncio
 import json
+import sys
 from datetime import date, datetime
 from pathlib import Path
 from typing import Any
+
+# Force UTF-8 on Windows consoles so Rich can emit ✓ / ✗ / Arabic glyphs.
+# CP1252 (the legacy default) can't encode them and crashes the CLI.
+if sys.platform == "win32":
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")  # type: ignore[attr-defined]
+        sys.stderr.reconfigure(encoding="utf-8")  # type: ignore[attr-defined]
+    except (AttributeError, OSError):
+        pass
 
 import click
 from rich.console import Console
