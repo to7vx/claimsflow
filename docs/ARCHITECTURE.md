@@ -208,9 +208,26 @@ FastAPI service exposing 11 endpoints across 6 routers, mounted under `/api/v1`.
 
 16 integration tests via `TestClient`: health + DB probe, request-id propagation, auth (401 without key, 202 with), single-claim get/404, list filtering by status, exception queue contents, metrics shape, decision breakdown, top-providers (volume + risk), webhook signature accept + reject. Uses `StaticPool` so the in-memory SQLite is shared across the test session and the background-task worker.
 
+## Module 6 — what shipped
+
+Click + Rich CLI exposing the full local workflow. Installed as the `claimsflow` console script.
+
+| Command | Purpose |
+| --- | --- |
+| `claimsflow init [--reset]` | Create / recreate all DB tables |
+| `claimsflow seed [--small\|--full] [--seed N]` | Populate synthetic data deterministically |
+| `claimsflow stats` | Row counts per table (Rich table) |
+| `claimsflow process <file\|dir>` | Adjudicate a claim JSON or a folder of them, with a Rich progress bar |
+| `claimsflow status <claim_id>` | Pretty panel with claim summary, decision reasoning, flags, and the last 10 audit-log events |
+| `claimsflow serve [--host --port --reload]` | Start the FastAPI app via uvicorn |
+| `claimsflow demo [--count N]` | Scripted demo: picks N RECEIVED seeded claims, runs them through the pipeline, prints a decision-type histogram |
+| `claimsflow hello` | Scaffold smoke test (Module 1 legacy) |
+
+Tests (5): each command's happy path against a tmp-path SQLite, plus `status` for an unknown claim and `status` after a real `process` round-trip (verifies the audit trail prints).
+
 ## Pending modules
 
-- **Module 6 — Click CLI with Rich** (next)
+- **Module 7 — React dashboard** (the biggest remaining module)
 - **Module 4 — 6-stage pipeline**
 - **Module 5 — FastAPI service**
 - **Module 6 — Click CLI**
