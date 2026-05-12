@@ -261,4 +261,4 @@ This list is the kind of thing you want to surface to the recruiter before they 
 
 ## License + acknowledgements
 
-MIT — see [LICENSE](./LICENSE). Thanks to the maintainers of all the libraries above. Built for the Tamheer Workflow Automation interview at Bupa Arabia; **not affiliated** with Bupa or any real insurer, **uses synthetic data only**, **not certified for real claims processing**.
+MIT — see [LICENSE](./LICENSE). Thanks to the maintainers of all the libraries above. 
