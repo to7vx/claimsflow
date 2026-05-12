@@ -103,9 +103,32 @@ erDiagram
                 json   event_data }
 ```
 
+## Module 3 — what shipped
+
+- `LLMProvider` Protocol with a single `reason(system, user, schema) -> LLMResponse[T]` method
+- Three implementations sharing one contract: `AnthropicProvider` (tool-use coercion for structured output), `OpenAIProvider` (json_schema response format), `OllamaProvider` (HTTP + `format: json` mode with schema embedded in system prompt)
+- Robust `parse_structured_response()` helper that strips markdown fences and extracts JSON from surrounding prose — small models need this
+- Settings-driven `get_llm_provider()` router cached via `lru_cache`; `reset_provider_cache()` for tests
+- Exponential backoff via `tenacity` on all three providers (3 attempts, 1–8s wait)
+- Token usage + per-call latency recorded on every response (`LLMResponse.usage`, `.latency_ms`)
+- Mocked unit tests cover all three providers + router + parser; opt-in `@pytest.mark.integration` test hits the real Anthropic API when `ANTHROPIC_API_KEY` is present
+
+### Provider selection
+
+```mermaid
+flowchart LR
+    settings[.env<br/>LLM_PROVIDER] --> router[router.get_llm_provider]
+    router -->|ollama| Ollama
+    router -->|anthropic| Anthropic
+    router -->|openai| OpenAI
+    Ollama -->|HTTP + format:json| local[Local Ollama]
+    Anthropic -->|tool_use| AnthropicAPI[Claude API]
+    OpenAI -->|json_schema| OpenAIAPI[OpenAI API]
+```
+
 ## Pending modules
 
-- **Module 3 — LLM provider abstraction** (next)
+- **Module 4 — 6-stage pipeline** (next, the agentic core)
 - **Module 4 — 6-stage pipeline**
 - **Module 5 — FastAPI service**
 - **Module 6 — Click CLI**
