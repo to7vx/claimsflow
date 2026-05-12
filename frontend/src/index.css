@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html {
+    font-feature-settings: "ss01", "cv11";
+  }
+
+  body {
+    @apply font-sans;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Arabic text uses the system Arabic stack — Manrope has limited Arabic glyphs. */
+  [lang="ar"],
+  [dir="rtl"] {
+    font-family: "IBM Plex Sans Arabic", "Noto Sans Arabic", system-ui, sans-serif;
+  }
+}
+
+@layer components {
+  .panel {
+    @apply bg-bg-secondary border border-border-subtle rounded-card shadow-panel;
+  }
+}

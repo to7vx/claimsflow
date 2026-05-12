@@ -1,0 +1,62 @@
+# --- Python -----------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+.python-version
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+.tox/
+
+# --- Node / Frontend --------------------------------------------------------
+node_modules/
+frontend/dist/
+frontend/.vite/
+*.tsbuildinfo
+.npm/
+.eslintcache
+
+# --- Env / Secrets ----------------------------------------------------------
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# --- Databases / Data -------------------------------------------------------
+*.sqlite
+*.sqlite3
+*.db
+backend/claimsflow.db
+backend/test.db
+
+# --- IDE / OS ---------------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Logs / Caches ----------------------------------------------------------
+logs/
+*.log
+.cache/
+
+# --- Project-specific (interview prep — do NOT commit) ----------------------
+docs/INTERVIEW_TALKING_POINTS.md
+
+# --- Build artifacts --------------------------------------------------------
+*.tar.gz
+*.zip
