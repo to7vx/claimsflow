@@ -38,10 +38,74 @@ Nothing in the diagram above is implemented yet — only the package skeleton, c
 | Manrope + JetBrains Mono pairing | Geometric humanist + technical mono — not generic Inter | Inter / Plex | Loads from Google Fonts |
 | Tailwind config with custom `decision.*` color tokens | Constrains the dashboard to a deliberate palette | shadcn defaults | Less plug-and-play |
 
+## Module 2 — what shipped
+
+- 6 ORM entities (`Plan`, `Member`, `Provider`, `Claim`, `Decision`, `AuditLog`) with proper relationships including self-referential `Member.dependents`
+- Pydantic v2 schemas mirroring the ORM, plus `ClaimSubmission` for the API ingest shape (validates non-empty diagnosis/procedure/line-item lists)
+- StrEnum-backed enums shared across ORM, Pydantic, and pipeline layers
+- Alembic initial migration generated from the metadata; verified end-to-end against fresh SQLite
+- Synthetic-data generators producing Saudi-realistic data: Arabic + English names from curated pools, ICD-10 codes covering common Saudi diagnoses (diabetes, hypertension, asthma, plus pediatric subset), CPT codes with realistic SAR pricing
+- Deterministic generation (seeded `random.Random`) so the same seed always produces the same dataset — required for reproducible tests and benchmarks
+- Intentional data variety: ~5% fraud-pattern claims (velocity, duplicates, procedure-diagnosis mismatch), ~15% exception cases (out-of-network, soft flags), ~80% routine
+- `claimsflow init [--reset]` and `claimsflow seed [--small|--full]` CLI commands with Rich progress + summary tables
+
+### ER diagram (Module 2)
+
+```mermaid
+erDiagram
+    PLAN ||--o{ MEMBER : "covers"
+    MEMBER ||--o{ CLAIM : "submits"
+    MEMBER ||--o{ MEMBER : "primary -> dependents"
+    PROVIDER ||--o{ CLAIM : "services"
+    CLAIM ||--o| DECISION : "yields"
+    CLAIM ||--o{ AUDIT_LOG : "logged"
+
+    PLAN { string plan_id PK
+           string plan_name
+           json   covered_benefits
+           json   exclusions
+           float  copay_percent
+           float  annual_limit_default }
+    MEMBER { string member_id PK
+             string full_name_en
+             string full_name_ar
+             string national_id
+             string plan_id FK
+             string policy_status
+             float  annual_limit
+             float  used_amount }
+    PROVIDER { string provider_id PK
+               string name_en
+               string name_ar
+               string provider_type
+               string network_tier
+               string city
+               float  fraud_risk_score }
+    CLAIM { string claim_id PK
+            string claim_type
+            string member_id FK
+            string provider_id FK
+            json   diagnosis_codes
+            json   procedure_codes
+            json   line_items
+            float  total_billed
+            string status }
+    DECISION { string decision_id PK
+               string claim_id FK
+               string decision_type
+               float  amount_approved
+               float  confidence_score
+               text   reasoning
+               json   policy_citations }
+    AUDIT_LOG { int    log_id PK
+                string claim_id FK
+                string event_type
+                json   event_data }
+```
+
 ## Pending modules
 
-- **Module 2 — Domain models + seed data** (next)
-- **Module 3 — LLM provider abstraction**
+- **Module 3 — LLM provider abstraction** (next)
 - **Module 4 — 6-stage pipeline**
 - **Module 5 — FastAPI service**
 - **Module 6 — Click CLI**
