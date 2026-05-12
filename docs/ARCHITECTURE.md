@@ -175,9 +175,42 @@ The orchestrator builds a one-paragraph reasoning string concatenating stage-by-
 
 55 passing — every stage in isolation (with a `FakeProvider` standing in for the LLM), every decision path (approve / approve-with-audit / deny / human review / fraud hold), cache-hit verification, and full orchestrator end-to-end producing a persisted `Decision` plus audit trail.
 
+## Module 5 — what shipped
+
+FastAPI service exposing 11 endpoints across 6 routers, mounted under `/api/v1`. Pipeline processing runs in `BackgroundTasks` so submission is non-blocking. OpenAPI lives at `/docs`.
+
+### Endpoints
+
+| Method | Path | Purpose | Auth |
+| --- | --- | --- | --- |
+| GET | `/healthz`, `/healthz/db` | Liveness + DB probe | public |
+| POST | `/api/v1/claims/submit` | Accept a claim, kick off pipeline | X-API-Key |
+| GET | `/api/v1/claims/{id}` | Single claim + decision | public |
+| GET | `/api/v1/claims` | Filtered, paginated list | public |
+| POST | `/api/v1/claims/{id}/review` | Human override (logs `HUMAN_OVERRIDE` event) | X-API-Key |
+| GET | `/api/v1/queue/exceptions` | Review queue, priority-sorted | public |
+| GET | `/api/v1/queue/fraud` | Fraud-hold queue | public |
+| GET | `/api/v1/metrics/overview` | Hero metrics | public |
+| GET | `/api/v1/metrics/decisions` | Decision-type breakdown | public |
+| GET | `/api/v1/metrics/quality` | Override rate + confidence stats | public |
+| GET | `/api/v1/providers/top` | Top providers by volume or risk | public |
+| POST | `/api/v1/webhook/n8n` | n8n entry point with HMAC-SHA256 signature | HMAC |
+
+### Cross-cutting
+
+- **CORS** — origins from `CORS_ORIGINS` (comma-separated). Exposes `X-Request-ID`.
+- **Request ID** — middleware stamps every request with a 16-char UUID hex; binds it into structlog contextvars and echoes it back in the response.
+- **Rate limiting** — `slowapi`, `120/minute` by default per remote IP. Returns 429.
+- **Logging** — structlog JSON in production, colored key=value in dev. One `request.complete` line per request with method/path/status/latency.
+- **Auth** — single static `X-API-Key` for writes; the n8n webhook uses HMAC-SHA256 over the raw body via `X-ClaimsFlow-Signature`. Public read endpoints make the demo trivially shareable.
+
+### Tests
+
+16 integration tests via `TestClient`: health + DB probe, request-id propagation, auth (401 without key, 202 with), single-claim get/404, list filtering by status, exception queue contents, metrics shape, decision breakdown, top-providers (volume + risk), webhook signature accept + reject. Uses `StaticPool` so the in-memory SQLite is shared across the test session and the background-task worker.
+
 ## Pending modules
 
-- **Module 5 — FastAPI service** (next)
+- **Module 6 — Click CLI with Rich** (next)
 - **Module 4 — 6-stage pipeline**
 - **Module 5 — FastAPI service**
 - **Module 6 — Click CLI**
