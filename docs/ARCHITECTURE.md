@@ -225,9 +225,58 @@ Click + Rich CLI exposing the full local workflow. Installed as the `claimsflow`
 
 Tests (5): each command's happy path against a tmp-path SQLite, plus `status` for an unknown claim and `status` after a real `process` round-trip (verifies the audit trail prints).
 
+## Module 7 — what shipped
+
+React 18 + Vite + TypeScript dashboard with five primary routes plus a single-claim detail view. Deliberately non-default visual direction: dark-first, Manrope + JetBrains Mono, distinctive decision-color tokens, never the AI-assistant purple gradient.
+
+### Routes
+
+| Path | Page | What it does |
+| --- | --- | --- |
+| `/` | Overview | Hero metrics, decision-breakdown chart (Recharts), AI-quality summary, period picker (today/week/month) |
+| `/queue/exceptions` | Exception queue | Priority-sorted list with `J/K` navigation + `Enter` to open side panel |
+| `/queue/fraud` | Fraud holds | Same shape as exceptions but for `fraud_hold` status |
+| `/quality` | AI quality | Override rate, median confidence, low-confidence count |
+| `/insights` | Provider insights | Top-10 providers by volume or risk, toggleable |
+| `/claims/:id` | Single claim | Decision panel + line items + bilingual EOB launcher |
+
+### Killer features
+
+- **Exception side panel** — slides in from the right with the AI reasoning paragraph as prose (not JSON), confidence meter, policy citations, flags, line items, and four action buttons. Keyboard shortcuts: `A` approve · `D` deny · `Esc` close. Action buttons hit the real review endpoint and invalidate the queue query so it updates live.
+- **Bilingual EOB modal** — side-by-side English + Arabic with proper `dir="rtl"` on the Arabic column.
+- **Confidence meter** — color shifts: green ≥0.9, amber 0.7–0.9, red <0.7.
+- **Live updates** — TanStack Query refetches every 10 seconds; a pulsing accent dot in the header signals "live."
+- **Skeleton loading** — every async page has skeleton rows, never spinners.
+- **Empty states** — every queue has a deliberate empty state ("Queue clear", "No active holds") rather than nothing.
+
+### Design tokens
+
+```text
+bg.primary       #0B0F14    fg.primary    #E6EDF3
+bg.secondary     #10161D    fg.secondary  #A6B3C0
+accent           #46E5B5    fg.muted      #6F7E8C
+
+decision.approve #46E5B5    decision.review  #F5C04D
+decision.deny    #FF6B7A    decision.fraud   #D946EF
+```
+
+Fonts: Manrope (UI), JetBrains Mono (data + tabular). Arabic text uses the system Arabic stack via `[lang="ar"]` and `[dir="rtl"]` selectors.
+
+### Tests
+
+3 Vitest tests covering: header + Overview heading render, ExceptionQueue heading on `/queue/exceptions`, Insights heading on `/insights`. Each test stubs `fetch` so the dashboard renders without a backend.
+
+### Build artifacts
+
+- `dist/index.html`  0.84 KB
+- `dist/assets/index-*.css`  ~15 KB (3.7 KB gzip)
+- `dist/assets/index-*.js`  ~604 KB (175 KB gzip)
+
+Bundle warning above 500 KB is intentional — Recharts + TanStack Query + Router + Lucide together exceed the default threshold but stay well within reasonable PoC limits. Splitting can come post-Module-10 if needed.
+
 ## Pending modules
 
-- **Module 7 — React dashboard** (the biggest remaining module)
+- **Module 10 — README + docs polish** (final)
 - **Module 4 — 6-stage pipeline**
 - **Module 5 — FastAPI service**
 - **Module 6 — Click CLI**
