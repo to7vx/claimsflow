@@ -126,9 +126,58 @@ flowchart LR
     OpenAI -->|json_schema| OpenAIAPI[OpenAI API]
 ```
 
+## Module 4 — what shipped (the agentic core)
+
+Six sequential stages, plus a router and a bilingual EOB generator. Each stage is a class with an async `process(claim, ctx) -> StageResult`. The orchestrator runs them, persists a `Decision`, and writes one `AuditLog` per stage plus terminal events.
+
+```mermaid
+sequenceDiagram
+    participant Orch as Orchestrator
+    participant DB as Postgres
+    participant LLM as LLM (Ollama / Anthropic / OpenAI)
+
+    Orch->>DB: load claim + member + plan + provider
+    Orch->>DB: AuditLog(CLAIM_RECEIVED)
+    Orch->>Orch: Stage 1 — Eligibility (pure rules)
+    Orch->>DB: AuditLog(stage_completed)
+    Note over Orch: short-circuit -> auto_deny
+    Orch->>Orch: Stage 2 — Provider validation (pure rules)
+    Orch->>LLM: Stage 3 — Medical-necessity verdict (cached)
+    Orch->>LLM: Stage 4 — Fraud reasoning (only if rules fired)
+    Orch->>Orch: Stage 5 — Cost calculation (pure rules)
+    Orch->>Orch: Stage 6 — Decision router
+    alt approval
+        Orch->>LLM: Generate bilingual EOB (en + ar)
+    end
+    Orch->>DB: Decision + AuditLog(DECISION_RENDERED)
+```
+
+### Stage map
+
+| Stage | Purpose | Pure rules | LLM | Caches |
+| --- | --- | --- | --- | --- |
+| Eligibility | Policy status, service-date window, annual limit, benefit coverage, plan-level diagnosis exclusions | ✓ | — | — |
+| Provider validation | License validity, contracted-rate variance (>120% flagged), out-of-network flag | ✓ | — | — |
+| Medical necessity | Does the procedure set fit the diagnoses? Fast-path on known textbook pairings; LLM only when something's off | partial | ✓ | (dx, cpt) hash |
+| Fraud detection | Duplicates within 7d, provider velocity, amount anomaly vs provider history, pediatric-on-adult mismatch, then LLM reasoning if any rule fires | partial | ✓ | — |
+| Cost calculation | Apply contracted rates, deductible, copay, OOP cap. Out-of-network → 0% covered | ✓ | — | — |
+| Decision router | Combine results + amount ceiling → auto_approve / auto_approve_with_audit / human_review / fraud_hold / auto_deny | ✓ | — | — |
+
+### LLM cache (medical necessity)
+
+Keyed on `sha256(sorted_diagnoses + "::" + sorted_procedures)[:16]`. In-process `OrderedDict` LRU, evicted at 2048 entries. The cache singleton lives at `claimsflow.pipeline.verdict_cache`; tests call `verdict_cache.clear()` between cases. The BENCHMARKS doc will quantify hit rate once Module 5/6 expose it.
+
+### Reasoning + bilingual EOB
+
+The orchestrator builds a one-paragraph reasoning string concatenating stage-by-stage findings (router verdict, eligibility outcome, provider tier/variance, LLM rationale, fraud signals). For auto-approved claims the EOB stage produces a bilingual member-facing letter (English + Arabic, schema-validated to require both languages non-empty). Falls back to a deterministic template if the LLM is unreachable.
+
+### Tests
+
+55 passing — every stage in isolation (with a `FakeProvider` standing in for the LLM), every decision path (approve / approve-with-audit / deny / human review / fraud hold), cache-hit verification, and full orchestrator end-to-end producing a persisted `Decision` plus audit trail.
+
 ## Pending modules
 
-- **Module 4 — 6-stage pipeline** (next, the agentic core)
+- **Module 5 — FastAPI service** (next)
 - **Module 4 — 6-stage pipeline**
 - **Module 5 — FastAPI service**
 - **Module 6 — Click CLI**
