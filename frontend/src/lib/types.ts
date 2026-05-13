@@ -119,6 +119,26 @@ export interface QualityMetrics {
   low_confidence_count: number;
 }
 
+export interface DemoJobState {
+  job_id: string;
+  kind: "run" | "reset";
+  started_at: string;
+  finished_at: string | null;
+  total: number;
+  current: number;
+  error: string | null;
+}
+
+export interface RecentClaimItem {
+  claim_id: string;
+  submission_date: string;
+  total_billed: number;
+  status: ClaimStatus;
+  decision_type: DecisionType | null;
+  decided_at: string | null;
+  confidence_score: number | null;
+}
+
 export interface ProviderInsight {
   provider_id: string;
   name_en: string;

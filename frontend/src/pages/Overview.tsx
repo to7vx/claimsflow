@@ -10,7 +10,9 @@ import {
   YAxis,
 } from "recharts";
 import { useDecisionBreakdown, useOverview, useQuality } from "@/lib/hooks";
+import { DemoControls } from "@/components/DemoControls";
 import { HeroMetric } from "@/components/HeroMetric";
+import { LiveActivityPanel } from "@/components/LiveActivityPanel";
 import { Skeleton, SkeletonRows } from "@/components/Skeleton";
 import { formatPercent, formatSAR, decisionLabel } from "@/lib/format";
 
@@ -30,14 +32,17 @@ export default function Overview() {
 
   return (
     <div className="space-y-6">
-      <header className="flex items-center justify-between">
+      <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold">Operations overview</h1>
           <p className="text-sm text-fg-secondary mt-1">
             Live state of the adjudication pipeline.
           </p>
         </div>
-        <PeriodPicker value={period} onChange={setPeriod} />
+        <div className="flex items-center gap-3">
+          <DemoControls />
+          <PeriodPicker value={period} onChange={setPeriod} />
+        </div>
       </header>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -74,6 +79,8 @@ export default function Overview() {
           </>
         )}
       </div>
+
+      <LiveActivityPanel />
 
       <section className="panel p-5">
         <h2 className="font-mono text-[10px] uppercase tracking-wider text-fg-muted mb-4">

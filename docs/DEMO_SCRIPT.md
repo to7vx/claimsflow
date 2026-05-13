@@ -1,8 +1,8 @@
-# 5-Minute Interview Demo Script
+# 5-Minute Demo Script
 
 A scene-by-scene script for showing ClaimsFlow live. Practise it twice — the goal is to land five specific moments in five minutes.
 
-## Pre-flight (done before the call starts)
+## Pre-flight (done before the demo starts)
 
 ```bash
 # Terminal 1 — backend
@@ -23,9 +23,8 @@ cd frontend && npm run dev             # http://localhost:5173
 ```text
 [00:00 – 00:30]  OPEN THE DASHBOARD
   SAY:  "This is ClaimsFlow — an open-source PoC for auto-adjudicating
-         medical insurance claims. I built it to show how I'd combine
-         workflow automation, agentic AI, and healthcare domain modeling
-         for the Tamheer role."
+         medical insurance claims. It's a demonstration of how to combine
+         workflow automation, agentic AI, and healthcare domain modeling."
   POINT: live indicator (pulsing dot, top-left), Auto-adjudication rate,
          Pending reviews, Total paid.
 
@@ -92,7 +91,7 @@ cd frontend && npm run dev             # http://localhost:5173
 | "What if the LLM is wrong?" | Two layers: confidence-based routing (low confidence → human), and the override rate metric (if reviewers keep flipping the AI, that's a signal something's off). Every override is logged with the reviewer ID. |
 | "How would you scale this?" | Swap BackgroundTasks for Celery/RQ. Swap the in-memory cache for Redis. Add horizontal Postgres read replicas. The LLM is the bottleneck — cache aggressively. |
 | "What's missing for SAMA / CCHI compliance?" | Field-level PHI encryption, signed audit-log chain, retention policies, RBAC, a real authn/z model. They're explicitly out of scope for the PoC — listed in the "What's NOT production-ready" README section. |
-| "Why Saudi context?" | The interview is for Bupa Arabia. The bilingual EOB and Arabic name pools are domain authenticity — not gimmicks. |
+| "Why Saudi context?" | The bilingual EOB and Arabic name pools are domain authenticity for the Saudi insurance market — not gimmicks. |
 
 ## Closing
 

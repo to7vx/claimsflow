@@ -16,7 +16,7 @@ from starlette.responses import JSONResponse
 
 from claimsflow import __version__
 from claimsflow.api.middleware import RequestIDMiddleware
-from claimsflow.api.routes import claims, health, metrics, providers, queue, webhook
+from claimsflow.api.routes import claims, demo, health, metrics, providers, queue, webhook
 from claimsflow.core.config import get_settings
 from claimsflow.core.logging import configure_logging
 
@@ -72,6 +72,7 @@ def create_app() -> FastAPI:
     app.include_router(metrics.router)
     app.include_router(providers.router)
     app.include_router(webhook.router)
+    app.include_router(demo.router)
 
     return app
 

@@ -1,0 +1,17 @@
+{
+  "claim_type": "outpatient",
+  "member_id": "MBR-00021",
+  "provider_id": "PRV-0005",
+  "service_date": "2026-05-12",
+  "diagnosis_codes": ["J45.909"],
+  "procedure_codes": ["94010"],
+  "line_items": [
+    {
+      "code": "94010",
+      "description": "Spirometry / pulmonary function test",
+      "quantity": 1,
+      "unit_cost": 240.00
+    }
+  ],
+  "clinical_notes": "Established asthma patient, spirometry per care plan."
+}

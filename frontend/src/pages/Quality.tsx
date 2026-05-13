@@ -31,7 +31,11 @@ export default function Quality() {
           <HeroMetric
             label="Low confidence (<50%)"
             value={data.low_confidence_count.toString()}
-            sub="decisions routed to humans"
+            sub={
+              data.low_confidence_count === 0
+                ? "none in this window — the AI is confident"
+                : "decisions routed to humans"
+            }
           />
         </div>
       )}

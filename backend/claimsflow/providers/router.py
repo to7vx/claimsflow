@@ -30,6 +30,7 @@ def get_llm_provider() -> LLMProvider:
         return OpenAIProvider(
             api_key=settings.openai_api_key,
             model=settings.openai_model,
+            base_url=settings.openai_base_url,
         )
     if settings.llm_provider == "ollama":
         from claimsflow.providers.ollama_provider import OllamaProvider

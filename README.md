@@ -237,7 +237,7 @@ This is a portfolio PoC. The following gaps are **deliberate**:
 - **No rate-limit-aware LLM batching** — bulk processing of >100 claims could hit provider limits
 - **Not affiliated with any real insurer** — built as a learning project framed around the domain
 
-This list is the kind of thing you want to surface to the recruiter before they ask. It signals you know what real production looks like.
+This list is the kind of thing worth surfacing to evaluators before they ask. It signals you know what real production looks like.
 
 ---
 
@@ -245,11 +245,10 @@ This list is the kind of thing you want to surface to the recruiter before they 
 
 1. **Module 8 — Docker compose** — `docker compose up` brings up Postgres + API + dashboard with healthchecks
 2. **Module 9 — n8n workflow JSON** — importable workflow demonstrating the webhook integration (Slack → Jira on fraud holds)
-3. **Real screenshots + a recorded GIF** — `/docs/assets/` populated by running the seeded demo
-4. **Redis-backed verdict cache** for multi-process deployments
-5. **Per-user RBAC** so reviewers see only the claims they own
-6. **A real test against ICD-10 / CPT licensed datasets**
-7. **Audit-grade signed log chain** (hash-linked AuditLog rows)
+3. **Redis-backed verdict cache** for multi-process deployments
+4. **Per-user RBAC** so reviewers see only the claims they own
+5. **A real test against ICD-10 / CPT licensed datasets**
+6. **Audit-grade signed log chain** (hash-linked AuditLog rows)
 
 ---
 

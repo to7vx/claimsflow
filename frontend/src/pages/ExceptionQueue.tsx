@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useExceptionQueue } from "@/lib/hooks";
 import { ExceptionSidePanel } from "@/components/ExceptionSidePanel";
 import { Badge } from "@/components/Badge";
+import { LiveBadge } from "@/components/LiveBadge";
 import { ConfidenceMeter } from "@/components/ConfidenceMeter";
 import { SkeletonRows } from "@/components/Skeleton";
 import { EmptyState } from "@/components/EmptyState";
@@ -61,7 +62,10 @@ export default function ExceptionQueue() {
               }`}
               onClick={() => setSelected(item)}
             >
-              <span className="col-span-2 font-mono text-xs text-fg-muted">{item.claim.claim_id}</span>
+              <span className="col-span-2 font-mono text-xs text-fg-muted flex items-center gap-2">
+                {item.claim.claim_id}
+                <LiveBadge at={item.decision?.decided_at ?? item.claim.submission_date} />
+              </span>
               <span className="col-span-3 truncate">
                 {item.member.full_name_en}
                 <span className="text-fg-muted text-xs ml-2">{item.provider.name_en}</span>
@@ -76,12 +80,23 @@ export default function ExceptionQueue() {
                 {item.decision && <ConfidenceMeter value={item.decision.confidence_score} />}
               </span>
               <span className="col-span-1 text-right">
-                <Badge tone="review">{item.sla_age_days}d</Badge>
+                <Badge tone={item.sla_age_days >= 3 ? "deny" : item.sla_age_days >= 1 ? "review" : "approve"}>
+                  {item.sla_age_days}d
+                </Badge>
               </span>
             </button>
           ))}
         </div>
       )}
+
+      <p className="text-[11px] font-mono text-fg-muted">
+        <kbd className="px-1 py-0.5 rounded bg-bg-tertiary border border-border">J</kbd>{" "}
+        <kbd className="px-1 py-0.5 rounded bg-bg-tertiary border border-border">K</kbd> navigate ·{" "}
+        <kbd className="px-1 py-0.5 rounded bg-bg-tertiary border border-border">Enter</kbd> open ·{" "}
+        <kbd className="px-1 py-0.5 rounded bg-bg-tertiary border border-border">A</kbd> approve ·{" "}
+        <kbd className="px-1 py-0.5 rounded bg-bg-tertiary border border-border">D</kbd> deny ·{" "}
+        <kbd className="px-1 py-0.5 rounded bg-bg-tertiary border border-border">Esc</kbd> close
+      </p>
 
       <ExceptionSidePanel item={selected} onClose={() => setSelected(null)} />
     </div>

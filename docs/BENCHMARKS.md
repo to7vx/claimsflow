@@ -18,7 +18,7 @@ Then query the database for the metrics below. The audit log records per-stage `
 | Metric | Source | Why it matters |
 | --- | --- | --- |
 | Per-stage latency (median, p95) | `audit_logs.event_data.latency_ms` where `event_type = 'stage_completed'` | Pinpoints which stage to optimise; LLM stages dominate |
-| End-to-end pipeline latency | `audit_logs.event_data.pipeline_ms` where `event_type = 'decision_rendered'` | The number the recruiter actually cares about |
+| End-to-end pipeline latency | `audit_logs.event_data.pipeline_ms` where `event_type = 'decision_rendered'` | The number that matters most for operations sign-off |
 | LLM tokens per claim by provider | Currently logged via structlog; needs aggregation | Cost forecasting |
 | Medical-necessity cache hit rate | `claimsflow.pipeline.verdict_cache.hit_rate` after the batch | Validates the cache is doing useful work |
 | Decision distribution | `SELECT decision_type, COUNT(*) FROM decisions GROUP BY 1` | Sanity check the seed data + pipeline routing |

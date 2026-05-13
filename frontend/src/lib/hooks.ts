@@ -36,6 +36,20 @@ export const useTopProviders = (metric: "volume" | "risk" = "volume") =>
     queryFn: () => api.topProviders(metric, 10),
   });
 
+export const useDemoStatus = (enabled = true, fastPoll = false) =>
+  useQuery({
+    queryKey: ["demo", "status"],
+    queryFn: () => api.demoStatus(),
+    enabled,
+    refetchInterval: fastPoll ? 1_000 : 5_000,
+  });
+
+export const useRecentClaims = (limit = 5) =>
+  useQuery({
+    queryKey: ["claims", "recent", limit],
+    queryFn: () => api.recentClaims(limit),
+  });
+
 export const useClaim = (id: string | null) =>
   useQuery({
     queryKey: ["claim", id],

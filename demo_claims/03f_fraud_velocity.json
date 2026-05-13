@@ -1,0 +1,21 @@
+{
+  "claim_type": "outpatient",
+  "member_id": "MBR-00001",
+  "provider_id": "PRV-0001",
+  "service_date": "2026-05-10",
+  "diagnosis_codes": [
+    "J06.9"
+  ],
+  "procedure_codes": [
+    "99213"
+  ],
+  "line_items": [
+    {
+      "code": "99213",
+      "description": "Office visit, established patient, 20-29 min",
+      "quantity": 1,
+      "unit_cost": 250.0
+    }
+  ],
+  "clinical_notes": "Routine follow-up for upper respiratory infection."
+}

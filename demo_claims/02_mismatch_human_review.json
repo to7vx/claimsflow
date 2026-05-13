@@ -1,0 +1,17 @@
+{
+  "claim_type": "outpatient",
+  "member_id": "MBR-00005",
+  "provider_id": "PRV-0005",
+  "service_date": "2026-05-11",
+  "diagnosis_codes": ["J45.909"],
+  "procedure_codes": ["70551"],
+  "line_items": [
+    {
+      "code": "70551",
+      "description": "MRI brain without contrast",
+      "quantity": 1,
+      "unit_cost": 4200.00
+    }
+  ],
+  "clinical_notes": "Patient referred for brain MRI. Primary diagnosis on file is asthma. Requesting authorization."
+}

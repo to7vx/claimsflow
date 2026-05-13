@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTopProviders } from "@/lib/hooks";
 import { Badge } from "@/components/Badge";
+import { EmptyState } from "@/components/EmptyState";
 import { SkeletonRows } from "@/components/Skeleton";
 import { formatSAR } from "@/lib/format";
 
@@ -33,7 +34,10 @@ export default function Insights() {
       {isLoading ? (
         <SkeletonRows rows={8} />
       ) : !data || data.length === 0 ? (
-        <p className="text-fg-secondary text-sm">No data yet.</p>
+        <EmptyState
+          title="No provider data"
+          message="Once claims have been processed, top providers by volume and fraud risk will appear here."
+        />
       ) : (
         <div className="panel divide-y divide-border-subtle">
           {data.map((p, i) => (

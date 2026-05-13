@@ -1,21 +1,21 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useClaim } from "@/lib/hooks";
-import { Badge } from "@/components/Badge";
-import { ConfidenceMeter } from "@/components/ConfidenceMeter";
 import { Skeleton } from "@/components/Skeleton";
 import { EobModal } from "@/components/EobModal";
-import { formatSAR, decisionLabel, decisionTone } from "@/lib/format";
+import { DecisionDetail } from "@/components/DecisionDetail";
+import { formatSAR } from "@/lib/format";
 
 export default function ClaimDetail() {
   const { id } = useParams<{ id: string }>();
   const { data, isLoading } = useClaim(id ?? null);
-  const [showEob, setShowEob] = useState(false);
+  const [showEobModal, setShowEobModal] = useState(false);
 
   if (isLoading) return <Skeleton className="h-64" />;
   if (!data) return <p className="text-fg-secondary">Claim not found.</p>;
 
   const { claim, decision } = data;
+  const hasEob = Boolean(decision?.eob_en && decision?.eob_ar);
 
   return (
     <div className="space-y-5">
@@ -31,31 +31,46 @@ export default function ClaimDetail() {
 
       {decision && (
         <section className="panel p-5">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="font-mono text-[10px] uppercase tracking-wider text-fg-muted">
-              Decision
-            </h2>
-            <div className="flex items-center gap-3">
-              <Badge tone={decisionTone[decision.decision_type] ?? "neutral"}>
-                {decisionLabel[decision.decision_type] ?? decision.decision_type}
-              </Badge>
-              <ConfidenceMeter value={decision.confidence_score} />
-            </div>
-          </div>
-          <p className="text-sm leading-relaxed">{decision.reasoning}</p>
-          <div className="mt-4 grid grid-cols-3 gap-3 text-sm">
+          <DecisionDetail decision={decision} />
+          <div className="mt-5 grid grid-cols-3 gap-3 text-sm">
             <Stat label="Approved" value={formatSAR(decision.amount_approved)} />
             <Stat label="Denied" value={formatSAR(decision.amount_denied)} />
             <Stat label="Member responsibility" value={formatSAR(decision.member_responsibility)} />
           </div>
-          {decision.eob_en && decision.eob_ar && (
+        </section>
+      )}
+
+      {hasEob && (
+        <section className="panel p-5">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="font-mono text-[10px] uppercase tracking-wider text-fg-muted">
+              Explanation of benefits
+            </h2>
             <button
-              className="mt-4 text-xs font-mono uppercase tracking-wider text-accent hover:underline"
-              onClick={() => setShowEob(true)}
+              className="text-xs font-mono uppercase tracking-wider text-accent hover:underline"
+              onClick={() => setShowEobModal(true)}
             >
-              View bilingual EOB →
+              Open in modal →
             </button>
-          )}
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <p className="font-mono text-[10px] uppercase tracking-wider text-fg-muted mb-2">
+                English
+              </p>
+              <p className="text-sm leading-relaxed text-fg-primary whitespace-pre-wrap">
+                {decision!.eob_en}
+              </p>
+            </div>
+            <div dir="rtl" className="md:border-l md:border-border-subtle md:pl-4">
+              <p className="font-mono text-[10px] uppercase tracking-wider text-fg-muted mb-2" dir="ltr">
+                Arabic
+              </p>
+              <p className="text-sm leading-relaxed text-fg-primary whitespace-pre-wrap">
+                {decision!.eob_ar}
+              </p>
+            </div>
+          </div>
         </section>
       )}
 
@@ -85,8 +100,8 @@ export default function ClaimDetail() {
         </table>
       </section>
 
-      {showEob && decision?.eob_en && decision?.eob_ar && (
-        <EobModal en={decision.eob_en} ar={decision.eob_ar} onClose={() => setShowEob(false)} />
+      {showEobModal && hasEob && (
+        <EobModal en={decision!.eob_en!} ar={decision!.eob_ar!} onClose={() => setShowEobModal(false)} />
       )}
     </div>
   );

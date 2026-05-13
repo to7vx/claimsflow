@@ -35,13 +35,13 @@ log = get_logger(__name__)
 class OpenAIProvider(LLMProvider):
     name = "openai"
 
-    def __init__(self, api_key: str, model: str) -> None:
+    def __init__(self, api_key: str, model: str, base_url: str | None = None) -> None:
         if not api_key:
             raise ValueError("OPENAI_API_KEY is required for OpenAIProvider")
         from openai import AsyncOpenAI
 
         self.model = model
-        self._client = AsyncOpenAI(api_key=api_key)
+        self._client = AsyncOpenAI(api_key=api_key, base_url=base_url or None)
 
     @retry(
         retry=retry_if_exception_type(Exception),

@@ -9,10 +9,12 @@ import type {
   Claim,
   ClaimWithDecision,
   DecisionBreakdownItem,
+  DemoJobState,
   OverviewMetrics,
   ProviderInsight,
   QualityMetrics,
   QueueItem,
+  RecentClaimItem,
 } from "./types";
 
 const BASE = "/api/v1";
@@ -47,6 +49,8 @@ export const api = {
 
   // Claims
   getClaim: (id: string) => request<ClaimWithDecision>(`${BASE}/claims/${id}`),
+  recentClaims: (limit = 5) =>
+    request<RecentClaimItem[]>(`${BASE}/claims/recent?limit=${limit}`),
   listClaims: (params: { status?: string; page?: number; limit?: number } = {}) => {
     const q = new URLSearchParams();
     for (const [k, v] of Object.entries(params)) {
@@ -84,6 +88,13 @@ export const api = {
   // Providers
   topProviders: (metric: "volume" | "risk" = "volume", limit = 10) =>
     request<ProviderInsight[]>(`${BASE}/providers/top?metric=${metric}&limit=${limit}`),
+
+  // Demo controls (only available when backend has DEMO_MODE=true)
+  demoStatus: () => request<DemoJobState | null>(`${BASE}/demo/status`),
+  demoRun: () =>
+    request<{ job_id: string; kind: "run" }>(`${BASE}/demo/run`, { method: "POST" }),
+  demoReset: () =>
+    request<{ job_id: string; kind: "reset" }>(`${BASE}/demo/reset`, { method: "POST" }),
 };
 
 export { ApiError };

@@ -52,6 +52,18 @@ class ClaimListResponse(BaseModel):
     total: int
 
 
+class RecentClaimItem(BaseModel):
+    """Compact row for the dashboard's Live Activity panel."""
+
+    claim_id: str
+    submission_date: datetime
+    total_billed: float
+    status: str
+    decision_type: str | None
+    decided_at: datetime | None
+    confidence_score: float | None
+
+
 @router.post(
     "/submit",
     response_model=SubmitResponse,
@@ -100,6 +112,37 @@ async def _process_in_background(claim_id: str) -> None:
         log.error("claim.background_failure", claim_id=claim_id, error=str(exc))
     finally:
         session.close()
+
+
+@router.get("/recent", response_model=list[RecentClaimItem])
+def recent_claims(
+    session: Session = Depends(db_session),
+    limit: int = Query(default=5, ge=1, le=50),
+) -> list[RecentClaimItem]:
+    """Most recently submitted claims with their latest decision joined.
+
+    Powers the dashboard's Live Activity panel. Ordered by submission_date desc.
+    """
+    rows = session.scalars(
+        select(Claim).order_by(Claim.submission_date.desc()).limit(limit)
+    ).all()
+    out: list[RecentClaimItem] = []
+    for c in rows:
+        dec = session.scalars(
+            select(Decision).where(Decision.claim_id == c.claim_id)
+        ).one_or_none()
+        out.append(
+            RecentClaimItem(
+                claim_id=c.claim_id,
+                submission_date=c.submission_date,
+                total_billed=c.total_billed,
+                status=c.status,
+                decision_type=dec.decision_type if dec else None,
+                decided_at=dec.decided_at if dec else None,
+                confidence_score=dec.confidence_score if dec else None,
+            )
+        )
+    return out
 
 
 @router.get("/{claim_id}", response_model=ClaimWithDecision)

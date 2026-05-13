@@ -57,7 +57,8 @@ logs/
 # --- Tooling-specific (local agent config) ----------------------------------
 .claude/
 
-# --- Project-specific (interview prep — do NOT commit) ----------------------
+# --- Private / local-only working files (never commit) ---------------------
+.private/
 docs/INTERVIEW_TALKING_POINTS.md
 
 # --- Build artifacts --------------------------------------------------------

@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
-import { ConfidenceMeter } from "./ConfidenceMeter";
-import { Badge } from "./Badge";
+import { DecisionDetail } from "./DecisionDetail";
 import { EobModal } from "./EobModal";
-import { formatSAR, decisionLabel, decisionTone } from "@/lib/format";
+import { formatSAR } from "@/lib/format";
 import type { QueueItem } from "@/lib/types";
 
 /**
@@ -87,51 +86,10 @@ export function ExceptionSidePanel({
         </section>
 
         {decision && (
-          <section className="mb-5">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="font-mono text-[10px] uppercase tracking-wider text-fg-muted">
-                AI reasoning
-              </h3>
-              <div className="flex items-center gap-2">
-                <Badge tone={decisionTone[decision.decision_type] ?? "neutral"}>
-                  {decisionLabel[decision.decision_type] ?? decision.decision_type}
-                </Badge>
-                <ConfidenceMeter value={decision.confidence_score} />
-              </div>
-            </div>
-            <p className="text-sm leading-relaxed text-fg-primary">{decision.reasoning}</p>
-          </section>
+          <div className="mb-5">
+            <DecisionDetail decision={decision} />
+          </div>
         )}
-
-        {decision?.policy_citations.length ? (
-          <section className="mb-5">
-            <h3 className="font-mono text-[10px] uppercase tracking-wider text-fg-muted mb-2">
-              Policy citations
-            </h3>
-            <ul className="space-y-1 text-sm">
-              {decision.policy_citations.map((c) => (
-                <li key={c} className="text-fg-secondary">
-                  · {c}
-                </li>
-              ))}
-            </ul>
-          </section>
-        ) : null}
-
-        {decision?.flags.length ? (
-          <section className="mb-5">
-            <h3 className="font-mono text-[10px] uppercase tracking-wider text-fg-muted mb-2">
-              Flags
-            </h3>
-            <div className="flex flex-wrap gap-1.5">
-              {decision.flags.map((f) => (
-                <Badge key={f} tone="review">
-                  {f}
-                </Badge>
-              ))}
-            </div>
-          </section>
-        ) : null}
 
         <section className="mb-5">
           <h3 className="font-mono text-[10px] uppercase tracking-wider text-fg-muted mb-2">

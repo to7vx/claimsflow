@@ -1,0 +1,17 @@
+{
+  "claim_type": "dental",
+  "member_id": "MBR-00023",
+  "provider_id": "PRV-0002",
+  "service_date": "2026-05-06",
+  "diagnosis_codes": ["K00.0"],
+  "procedure_codes": ["D1110"],
+  "line_items": [
+    {
+      "code": "D1110",
+      "description": "Prophylaxis (adult dental cleaning)",
+      "quantity": 1,
+      "unit_cost": 800.00
+    }
+  ],
+  "clinical_notes": "Routine dental prophylaxis at out-of-network dental clinic."
+}

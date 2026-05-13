@@ -46,11 +46,20 @@ class Settings(BaseSettings):
     anthropic_model: str = "claude-haiku-4-5-20251001"
     openai_api_key: str = ""
     openai_model: str = "gpt-4o-mini"
+    # Optional override — e.g. Gemini's OpenAI-compatible endpoint.
+    # Leave blank for the real OpenAI API.
+    openai_base_url: str = ""
 
     # --- Pipeline ---
     auto_approve_amount_ceiling_sar: float = Field(default=50_000.0)
     medical_necessity_cache_ttl: int = 86_400
     api_rate_limit_per_minute: int = 120
+
+    # --- Demo controls ---
+    # When true, exposes /api/v1/demo/run and /api/v1/demo/reset so the
+    # dashboard's "Run Demo" / "Clear Demo Data" buttons work. Set to false
+    # in any real deployment.
+    demo_mode: bool = True
 
     @property
     def cors_origin_list(self) -> list[str]:
